@@ -39,21 +39,35 @@ sudo apt-get install -y \
   alsa-utils \
   pipewire pipewire-alsa pipewire-audio pipewire-bin pipewire-pulse wireplumber \
   libgirepository1.0-dev libcairo2-dev pkg-config \
+  iptables \
+  python3-dbus python3-gi \
   git
 
 # ---------------------------------------------------------------------------
-# 2. Python virtual environment (isolated -- not --system-site-packages)
+# 2. Python virtual environment
 # ---------------------------------------------------------------------------
 echo ""
 echo "--- [2/8] Setting up Python virtual environment ---"
+# --system-site-packages is required here specifically so the venv can see
+# the system-installed python3-dbus/python3-gi above. dbus-python and
+# PyGObject are deep C bindings into the system's actual GLib/D-Bus
+# libraries -- a pip-built copy can silently mismatch against the real
+# runtime in ways that don't error, they just misbehave (confirmed: this
+# is exactly what caused Beacon Relay's advertisement registration to fail
+# on a from-scratch venv, while working fine with the system packages).
 if [ ! -d "$KYBER_DIR/venv" ]; then
-  python3 -m venv "$KYBER_DIR/venv"
+  python3 -m venv --system-site-packages "$KYBER_DIR/venv"
   echo "Created venv at $KYBER_DIR/venv"
 else
   echo "venv already exists, reusing it"
 fi
 
 "$KYBER_DIR/venv/bin/python" -m pip install --upgrade pip
+# Pinned below 82: setuptools 82.0.0 (Feb 2026) permanently removed
+# pkg_resources, which webrtcvad (an older, unmaintained package) still
+# imports at its own module level. Without this pin, webrtcvad silently
+# fails to import and VAD-based mic capture never works.
+"$KYBER_DIR/venv/bin/python" -m pip install "setuptools<82"
 "$KYBER_DIR/venv/bin/python" -m pip install -r "$KYBER_DIR/requirements.txt"
 
 # ---------------------------------------------------------------------------
@@ -170,6 +184,13 @@ sudo visudo -c
 # ---------------------------------------------------------------------------
 echo ""
 echo "--- [6/8] Enabling BlueZ experimental mode ---"
+
+# Fresh Raspberry Pi OS images can ship with Bluetooth soft-blocked by
+# default (often tied to regional/country-code settings never being set
+# during imaging). Nothing downstream -- bluetoothctl, KYBER's own
+# scanning, none of it -- can work until this is cleared.
+sudo rfkill unblock bluetooth
+
 sudo mkdir -p /etc/systemd/system/bluetooth.service.d
 sudo tee /etc/systemd/system/bluetooth.service.d/override.conf > /dev/null <<'EOF'
 [Service]
@@ -203,11 +224,17 @@ sudo systemctl enable --now kyber_config.service
 sudo systemctl enable --now kyber.service
 
 HOSTNAME="$(hostname)"
+IP_ADDRESS="$(hostname -I | awk '{print $1}')"
 echo ""
 echo "======================================================"
 echo " KYBER installed."
 echo ""
-echo " Next step: open http://$HOSTNAME.local:5001"
-echo " in a browser to run the onboarding wizard and pair"
-echo " your droid."
+echo " Next step: open one of these in a browser to run the"
+echo " onboarding wizard and pair your droid:"
+echo ""
+echo "   http://$HOSTNAME.local:5001"
+echo "   http://$IP_ADDRESS:5001"
+echo ""
+echo " If the first one doesn't load (.local addresses don't"
+echo " always resolve on every network), use the IP instead."
 echo "======================================================"
