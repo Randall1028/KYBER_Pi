@@ -1,0 +1,11 @@
+.env
+.env.bak
+.env.bak.*
+__pycache__/
+*.pyc
+venv/
+*.log
+personality_maps/*.bak
+personality_maps/personality_[0-9].json
+personality_maps/sound_profile_*.json
+!personality_maps/sound_profile_1.json
