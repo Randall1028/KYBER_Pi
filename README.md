@@ -40,7 +40,7 @@ This project is a hobbyist build, made for the Star Wars fan/maker community. It
 2. Boot the Pi and SSH in.
 3. Clone this repo to `~/kyber` (the path is hardcoded, so it needs to live there):
    ```bash
-   git clone <this-repo-url> ~/kyber
+   git clone https://github.com/Randall1028/KYBER_Pi.git ~/kyber
    cd ~/kyber
    ```
 4. Run the installer:
