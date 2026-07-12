@@ -18,7 +18,7 @@ This project is a hobbyist build, made for the Star Wars fan/maker community. It
 - **Autonomous modes**, triggered by voice:
   - **Pet Entertainer** — fast, erratic movement bursts, meant to give a cat or dog something to chase.
   - **Expressive Mode** — more animated, frequent gesture movement during conversation.
-  - **Hotel Sentry** — not a security patrol. It's a small, deliberate movement roughly every 15 minutes for up to 8 hours, timed specifically to keep a hotel room's motion-sensing AC/lights from timing out overnight. While active, it ignores everything it hears except the command to stop — so it won't start talking back because it picked up snoring or sleep-talking in the room.
+  - **Hotel Sentry** — not a security patrol. It's a small, deliberate movement roughly every 15 minutes for up to 8 hours, timed specifically to keep a hotel room's motion-sensing AC/lights from timing out overnight. While active, it ignores everything it hears except the command to stop — so it won't get distracted
 - **Beacon Relay** *(optional, on by default)* — scans for other droids and official Disney location beacons, and rebroadcasts your droid's own presence so nearby detectors and other droids can see it too.
 - **Mainframe** — a browser-based control panel (reachable at `http://<your-droid>.local:5001`) for onboarding, personality editing, sound profile mapping, network setup, motor calibration, and switching between STT/LLM providers.
 - **Multi-provider support** — choose your speech-to-text engine (Deepgram, Groq, OpenAI, Google, or AssemblyAI) and your LLM (Gemini, OpenAI, Anthropic, or Groq) independently, and switch anytime from Mainframe.
